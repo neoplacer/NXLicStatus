@@ -1,4 +1,4 @@
-﻿using System;
+ng System;
 using System.Collections.Generic;
 using System.Collections; 
 using System.Linq;
@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace NXLicStatus
 {
@@ -30,8 +31,18 @@ namespace NXLicStatus
         public MainWindow()
         {
             InitializeComponent();
-            getItem();
+            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherTimer.Tick += dispatcherTimer_Tick;
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            dispatcherTimer.Start();
+            this.cmdDo.Content = "Bitte Warten";
+            this.cmdDo.IsEnabled = false;
             
+        }
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            getItem();
+            dispatcherTimer.Stop();
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -40,6 +51,8 @@ namespace NXLicStatus
 
         private void getItem()
         {
+            this.cmdDo.IsEnabled = false;
+            this.cmdDo.Content = "Bitte Warten";
             this.LicenseOverview.Items.Clear();
             this.partlist = new ArrayList(); 
            // this.LicData = String.Empty;
@@ -97,7 +110,8 @@ namespace NXLicStatus
                 }
       
             }
-           
+           this.cmdDo.Content = "Abfragen";
+           this.cmdDo.IsEnabled = true;
         }
 
         void build_ErrorDataReceived(object sender, DataReceivedEventArgs e)
